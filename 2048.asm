@@ -1,19 +1,18 @@
+%include "syscall.asm"
+%include "print.asm"
+
 global _start
 
 section .text
 
 _start:
-  mov rax, 1        ; write(
-  mov rdi, 1        ;   STDOUT_FILENO,
-  mov rsi, ansiRed  ;   ansiRed,
+  mov rsi, ansiRed  ;   print(ansiRed,
   mov rdx, ansiLen  ;   sizeof(ansiRed)
-  syscall           ; );
+  call print           ;   );
 
-  mov rax, 1        ; write(
-  mov rdi, 1        ;   STDOUT_FILENO,
-  mov rsi, msg      ;   "Hello, world!\n",
-  mov rdx, msglen   ;   sizeof("Hello, world!\n")
-  syscall           ; );
+  mov rsi, msg      ;   println("Hello, world!",
+  mov rdx, msglen   ;   sizeof("Hello, world!")
+  call println      ;   );
 
   mov rdx, triangle
   mov r8, 1
@@ -32,19 +31,18 @@ lineEnd:
   cmp r8, maxLines
   jng line
 done:
-  mov rax, 1
-  mov rdi, 1
   mov rsi, triangle
   mov rdx, triLen
-  syscall
+  call print
 exit:
   mov rax, 60       ; exit(
   mov rdi, 0        ;   EXIT_SUCCESS
   syscall           ; );
 
 section .data
-  msg: db "Hello, world!", 10
+  msg: db "Hello, world!"
   msglen: equ $ - msg
+
   maxLines: equ 8
   triLen: equ 44
 
