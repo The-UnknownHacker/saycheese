@@ -56,6 +56,13 @@ ioctl:
     pop rdi
     ret
 
+global getrandom
+
+getrandom:
+    mov rax, 318
+    syscall
+    ret
+
 global exit
 
 exit:
