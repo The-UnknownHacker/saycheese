@@ -15,38 +15,43 @@ global itoa
 
 ; rdi: value
 ; rsi: buffer pointer
+; rax: return, number of bytes written
 itoa:
     xor rcx, rcx
 ._itoa:
-
-    mov rax, rdi
-    div byte [dividend]
-    mov dil, al
-    add ah, "0"
-    mov byte [rsi + rcx], ah
+    xor edx, edx
+    mov eax, edi
+    div dword [dividend]
+    add edx, "0"
+    mov byte [rsi + rcx], dl
     inc rcx
 
-    cmp dil, 0
+    mov edi, eax
+    cmp edi, 0
     jnz ._itoa
 .reverse:
     mov byte [rsi + rcx], 0 ; null-terminate string
+    mov rax, rcx            ; move string length into return register
     
     ; below this is equivalent to strrev() in C's stdlib
     ; (without checking strlen since that's already stored in `rcx`)
+    cmp rcx, 1
+    jg .revloop_init
+.revloop_init:
     dec rcx                 ; set rcx to strlen - 1
-    xor rax, rax            ; set rax to 0
+    xor r10, r10            ; set r10 to 0
 .revloop:
     ; swap the bytes on opposite ends of the string
-    mov dil, byte [rsi + rax]
+    mov dil, byte [rsi + r10]
     mov r8b, byte [rsi + rcx] 
-    mov byte [rsi + rax], r8b
+    mov byte [rsi + r10], r8b
     mov byte [rsi + rcx], dil
 
-    inc rax
+    inc r10
     dec rcx
-    cmp rax, rcx
+    cmp r10, rcx
     jl .revloop
-
+.return:
     ret
 
 global randint
@@ -87,6 +92,46 @@ randint:
     pop r13
     pop r12
 
+    ret
+
+global memcpy
+
+; rdi: destination address
+; rsi: source address
+; rdx: length
+memcpy:
+    cmp rdx, 0
+    jz .return
+
+    mov al, byte [rsi]
+    mov byte [rdi], al
+
+    inc rdi
+    inc rsi
+    dec rdx
+    jmp memcpy
+.return:
+    ret
+
+global ilog2
+
+; returns the base 2 logarithm of the number, rounded down
+; returns 0 if the given value is 0.
+; rdi: value
+; rax: return value
+ilog2:
+    xor rax, rax
+    shr rdi, 1
+.loop:
+    cmp rdi, 0
+    jz .return
+
+    shr rdi, 1
+
+    inc rax
+    jmp .loop
+
+.return:
     ret
 
 global set_foreground
@@ -141,12 +186,27 @@ set_ansi:
     pop r12
     ret
 
+global clear_term
+
+clear_term:
+    mov rsi, ansi_clear
+    mov rdx, ansi_clear_len
+    call print
+
+    mov rsi, ansi_home
+    mov rdx, ansi_home_len
+    call print
+
+    ret
+
 
 section .data
-    dividend: db 10
+    dividend: dd 10
     DEF_STR ansi_reset, 27,"[0m"
     DEF_STR ansi_foreground, 27,"[38;5;"
     DEF_STR ansi_background, 27,"[48;5;"
     DEF_STR ansi_end, "m"
+    DEF_STR ansi_clear, 27,"[2J"
+    DEF_STR ansi_home, 27,"[H"
 
 %endif
