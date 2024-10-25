@@ -33,6 +33,8 @@ println:
 
 global getchar
 
+; gets the character at the top of stdin
+; rax: return character
 getchar:
     mov rdi, 0        ; read from STDIN (fd 0)
     push 0            ; make room at the top of the stack to read into

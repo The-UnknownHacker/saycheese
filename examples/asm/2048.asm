@@ -7,68 +7,28 @@ global _start
 section .text
 
 _start:
-    mov rdi, bg_color
-    mov rsi, bg_color_len
-    call set_background
-
     call unbuffer         ; unbuffer stdin
+
+    call tile_randgen
 poll_loop:
+    call tile_randgen
+    call draw_board
+
+.read:
     call getchar
-    cmp rax, 0                ; check if the character is `EOF`
-    je poll_loop            ; try again if `EOF`
-
-    push r12                    ; r12 is a "preserved" register, so we have to save the contents
-    mov r12, rax
-
-    push qword 0            ; make space on the stack for the character
-    mov rdi, r12            ; itoa(value: r12,
-    mov rsi, rsp            ;            buffer: rsp
-    call itoa                 ; );
-
-    mov rsi, rsp
-    mov rdx, 3
-    call println
-    add rsp, 8
-
-    cmp r12, 10
-    je finish
-
-    pop r12                     ; retstore the saved contents of r12 
-    jmp poll_loop
-finish:
-    call reset_color
-
-    mov rsi, hello_world
-    mov rdx, hello_world_len
-    call println
-
-    push r12
-    xor r12, r12
-
-.randloop: ; generate random number in range 0-15
-    mov dil, 0
-    mov sil, 15
-    call randint
-
-    sub rsp, 8
-    mov rdi, rax
-    mov rsi, rsp
-    call itoa
-
-    mov rsi, rsp
-    mov rdx, rax
-    call println
-    add rsp, 8
-
-    inc r12
-    cmp r12, 20
-    jl .randloop
-
-    call clear_term
-    call draw_board
-
-    call clear_term
-    call draw_board
+    
+    cmp al, "w"
+    je up
+    cmp al, "a"
+    je left
+    cmp al, "s"
+    je down
+    cmp al, "d"
+    je right
+    cmp al, 10
+    je .finish
+    jmp .read
+.finish:
 
     pop r12
     call restore_buffer
@@ -76,13 +36,128 @@ finish:
 
     jmp exit
 
+up:
+    jmp update
+
+down:
+    jmp update
+
+right:
+    jmp update
+
+left:
+    xor rdi, rdi
+.row_loop:
+    xor rsi, rsi
+    inc rsi
+    mov r8, rdi
+    shl r8, 3
+.tile_loop:
+    mov cx, word [board + r8 + 2*rsi]
+    mov rdx, rsi
+    dec rdx
+.tile_tile_loop: 
+    mov ax, word [board + r8 + 2*rdx]
+
+    cmp ax, 0
+    jz .reloop
+
+    cmp ax, cx
+    je .combine_tile
+
+    mov word [board + r8 + 2*rsi], 0
+    mov word [board + r8 + 2*rdx + 2], cx
+    jmp .finish_tile
+
+.reloop:
+    dec rdx
+    cmp rdx, 4        ; compare to 4, since if rdx is 4 or greater we know the counter has underflowed
+    jb .tile_tile_loop
+    mov word [board + r8 + 2*rsi], 0
+    mov word [board + r8], cx
+
+    jmp .finish_tile
+
+.combine_tile:
+    shl cx, 1
+    mov word [board + r8 + 2*rsi], 0
+    mov word [board + r8 + 2*rdx], cx
+
+.finish_tile:
+
+    inc rsi
+    cmp rsi, 4
+    jl .tile_loop
+
+    inc rdi
+    cmp rdi, 4
+    jl .row_loop
+
+update:
+    jmp poll_loop
+
+end_loss:
+    push r12
+    push r13
+    mov r12, lose
+    mov r13, lose_len
+    jmp end
+end_win:
+    push r12
+    push r13
+    mov r12, win
+    mov r13, win_len
+end:
+    mov rsi, you
+    mov rdx, you_len
+    call print
+
+    mov rsi, r12
+    mov rdx, r13
+    call print
+
+    mov rsi, exclaim
+    mov rdx, exclaim_len
+    call println
+
+    pop r13
+    pop r12
+    ret
+
+tile_randgen:
+    xor rdi, rdi
+    xor rsi, rsi
+    mov rdx, 1
+.zero_loop:
+    cmp word [board + 2*rdi], 0
+    cmove rsi, rdx
+
+    inc rdi
+    cmp rdi, 16
+    jl .zero_loop
+
+    cmp rsi, 0
+    jz end_loss
+.rand_loop:
+    mov dil, 0    ; randint(
+    mov sil, 15   ;     0, 15
+    call randint  ; );
+
+    cmp word [board + 2*rax], 0
+    jnz .rand_loop
+
+    mov word [board + 2*rax], 2
+
+    ret
+
 draw_board:
+    call clear_term
     push r12
     push r13
     push r14
     push r15
 
-    ; YES THIS IS FOUR NESTED FOR LOOPS SHUT UP
+    ; YES THIS IS THREE NESTED FOR LOOPS SHUT UP
 
     xor r12, r12
 .row_loop:        ; for (r12 = 0; r12 < 16; r12 += 4) {
@@ -166,7 +241,11 @@ set_box_color:
     push r12
     mov r12, rdi
 
-    mov rdi, [bg_colors + rdi*8]
+    mov rax, bg_color_0
+    add rax, rdi
+    add rax, rdi
+    add rax, rdi
+    mov rdi, rax
 
     mov rsi, bg_color_len
     call set_background
@@ -188,20 +267,18 @@ set_box_color:
 
 
 section .data
-    DEF_STR bg_color, "234"
-    DEF_STR hello_world, "Hello world!"
-
+    DEF_STR you, "You"
+    DEF_STR win, "got 2048"
+    DEF_STR lose, "lose"
+    DEF_STR exclaim, "!"
     DEF_STR space, " "
 
     DEF_STR tile_line, "          "
     DEF_STR rewritable_tile_line, "          "
 
-    board: dw 2, 4, 8, 16, \
-              256, 128, 64, 32, \
-              512, 1024, 2048, 0, \
-              0, 0, 0, 0
+    board: times 16 dw 0
 
-    bg_color_0: db "235"
+    bg_color_0: db "236"
     bg_color_2: db "231"
     bg_color_4: db "230"
     bg_color_8: db "227"
@@ -217,8 +294,4 @@ section .data
 
     DEF_STR fg_color_dark, "0"
     DEF_STR fg_color_light, "15"
-
-    bg_colors: dq bg_color_0, bg_color_2, bg_color_4, bg_color_8, \
-                  bg_color_16, bg_color_32, bg_color_64, bg_color_128, \
-                  bg_color_256, bg_color_512, bg_color_1024, bg_color_2048
     
