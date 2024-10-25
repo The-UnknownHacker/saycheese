@@ -37,13 +37,58 @@ poll_loop:
     jmp exit
 
 up:
-    jmp update
+    jmp poll_loop
 
 down:
-    jmp update
+    jmp poll_loop
 
 right:
-    jmp update
+    xor rdi, rdi
+.row_loop:
+    mov rsi, 2
+    mov r8, rdi
+    shl r8, 3
+.tile_loop:
+    mov cx, word [board + r8 + 2*rsi]
+    mov rdx, rsi
+    inc rdx
+.tile_tile_loop: 
+    mov ax, word [board + r8 + 2*rdx]
+
+    cmp ax, 0
+    jz .reloop
+
+    cmp ax, cx
+    je .combine_tile
+
+    mov word [board + r8 + 2*rsi], 0
+    mov word [board + r8 + 2*rdx - 2], cx
+    jmp .finish_tile
+
+.reloop:
+    inc rdx
+    cmp rdx, 4        
+    jl .tile_tile_loop
+    mov word [board + r8 + 2*rsi], 0
+    mov word [board + r8 + 6], cx
+
+    jmp .finish_tile
+
+.combine_tile:
+    shl cx, 1
+    mov word [board + r8 + 2*rsi], 0
+    mov word [board + r8 + 2*rdx], cx
+
+.finish_tile:
+
+    dec rsi
+    cmp rsi, 4      ; compare to 4, since if rsi is 4 or greater we know the counter has underflowed
+    jb .tile_loop
+
+    inc rdi
+    cmp rdi, 4
+    jl .row_loop
+    jmp poll_loop
 
 left:
     xor rdi, rdi
@@ -93,7 +138,6 @@ left:
     cmp rdi, 4
     jl .row_loop
 
-update:
     jmp poll_loop
 
 end_loss:
