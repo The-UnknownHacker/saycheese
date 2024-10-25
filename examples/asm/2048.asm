@@ -30,11 +30,10 @@ poll_loop:
     je right
 
     cmp al, 10
-    je .finish
+    je finish
 
     jmp .read
-.finish:
-
+finish:
     pop r12
     call restore_buffer
     mov rdi, 0
@@ -174,13 +173,14 @@ end:
     mov rdx, r13
     call print
 
-    mov rsi, exclaim
-    mov rdx, exclaim_len
+    mov rsi, intro + 11 ; there is a "!" at the end of "2048!"
+    xor rdx, rdx
+    inc rdx
     call println
 
     pop r13
     pop r12
-    ret
+    jmp finish
 
 tile_randgen:
     xor rdi, rdi
@@ -210,6 +210,14 @@ tile_randgen:
 
 draw_board:
     call clear_term
+
+    mov rsi, intro
+    mov rdx, intro_len
+    call println
+    xor rsi, rsi
+    xor rdx, rdx
+    call println
+
     push r12
     push r13
     push r14
@@ -240,8 +248,10 @@ draw_board:
     mov rdx, tile_line_len
     jmp .line_done
 .value_line:
+    push rbx
+    mov rbx, rewritable_tile_line
 
-    mov rdi, rewritable_tile_line
+    mov rdi, rbx
     mov rsi, tile_line
     mov rdx, tile_line_len
     call memcpy
@@ -251,21 +261,23 @@ draw_board:
     mov rsi, rsp
     call itoa    ; convert the tile value to a string
 
-    mov rdi, rewritable_tile_line
+    mov rdi, rbx
     add rdi, 3 ; center(ish) the output value
     mov rsi, rsp
     mov rdx, rax
     call memcpy  ; copy the value into the printed line
     add rsp, 8   ; restore stack
 
-    mov rsi, rewritable_tile_line
-    mov rdx, rewritable_tile_line_len
+    mov rsi, rbx
+    mov rdx, tile_line_len
+    pop rbx
 .line_done:
     call print
 
     call reset_color ; reset out terminal color
     mov rsi, space
-    mov rdx, space_len
+    xor rdx, rdx
+    inc rdx
     call print       ; print a space between each box
 
     inc r14
@@ -292,6 +304,11 @@ draw_board:
     pop r14
     pop r13
     pop r12
+
+    mov rsi, instructions
+    mov rdx, instructions_len
+    call print
+
     ret
 
 ; rdi: log2(box value)
@@ -325,14 +342,15 @@ set_box_color:
 
 
 section .data
-    DEF_STR you, "You"
+    DEF_STR intro, 27,"[1;34m2048!",27,"[22m"
+    DEF_STR instructions, 27,"[1;35mUse W(^), A(<), S(v), D(>) to move",10,"Use Return/Enter to exit",27,"[22m"   
+    DEF_STR you, 10,10,"You "
     DEF_STR win, "got 2048"
     DEF_STR lose, "lose"
-    DEF_STR exclaim, "!"
     DEF_STR space, " "
 
     DEF_STR tile_line, "          "
-    DEF_STR rewritable_tile_line, "          "
+    rewritable_tile_line: db "          "
 
     board: times 16 dw 0
 
