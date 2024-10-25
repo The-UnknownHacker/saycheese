@@ -18,23 +18,20 @@ poll_loop:
     call getchar
     
     cmp al, "w"
-    call up
-    jmp poll_loop
+    je up
 
     cmp al, "a"
-    call left
-    jmp poll_loop
+    je left
 
     cmp al, "s"
-    call down
-    jmp poll_loop
+    je down
 
     cmp al, "d"
-    call right
-    jmp poll_loop
+    je right
 
     cmp al, 10
     je .finish
+
     jmp .read
 .finish:
 
@@ -49,32 +46,36 @@ up:
     call rotate_board
     call rotate_board
 
-    call left
+    call shift
 
     call rotate_board
-    ret
+    jmp poll_loop
 
 down:
     call rotate_board
 
-    call left
+    call shift
 
     call rotate_board
     call rotate_board
     call rotate_board
-    ret
+    jmp poll_loop
 
 right:
     call rotate_board
     call rotate_board
 
-    call left
+    call shift
 
     call rotate_board
     call rotate_board
-    ret
+    jmp poll_loop
 
 left:
+    call shift
+    jmp poll_loop
+
+shift:
     xor rdi, rdi
 .row_loop:
     xor rsi, rsi
@@ -122,7 +123,7 @@ left:
     cmp rdi, 4
     jl .row_loop
 
-    jmp poll_loop
+    ret
 
 rotate_board:
     mov rdi, scratch_board
@@ -141,7 +142,7 @@ rotate_board:
     sub rsi, rdi
     mov word [board + 6 + 2*rsi], dx
     add rsi, rdi
-    shr sil, 3
+    shr sil, 2
 
     inc rsi
     cmp sil, 4
