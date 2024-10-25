@@ -3,18 +3,20 @@
   inputs.flake-utils.url = github:numtide/flake-utils;
 
   outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
-      {
-        defaultPackage = let
-          pkgs = nixpkgs.legacyPackages.${system};
+    flake-utils.lib.eachDefaultSystem
+      (system:
+        let
+          pkgs = import nixpkgs { inherit system; };
         in
-        pkgs.mkShell {
-          buildInputs = [
-            pkgs.gcc  
-            pkgs.nasm
-            pkgs.qrencode
-          ];
-        };
-      }
-    );
+        with pkgs;
+        {
+          devShells.default = mkShell {
+            buildInputs = [ 
+              gcc
+              nasm
+              qrencode  
+            ];
+          };
+        }
+      );
 }
