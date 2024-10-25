@@ -18,13 +18,21 @@ poll_loop:
     call getchar
     
     cmp al, "w"
-    je up
+    call up
+    jmp poll_loop
+
     cmp al, "a"
-    je left
+    call left
+    jmp poll_loop
+
     cmp al, "s"
-    je down
+    call down
+    jmp poll_loop
+
     cmp al, "d"
-    je right
+    call right
+    jmp poll_loop
+
     cmp al, 10
     je .finish
     jmp .read
@@ -37,108 +45,34 @@ poll_loop:
     jmp exit
 
 up:
-    xor rdi, rdi
-.column_loop:
-    xor rsi, rsi
-    inc rsi
-.tile_loop:
-    mov r8, rsi
-    shl r8, 3
-    mov cx, word [board + r8 + 2*rdi]
-    mov rdx, rsi
-    dec rdx
-.tile_tile_loop: 
-    mov r9, rdx
-    shl r9, 3
+    call rotate_board
+    call rotate_board
+    call rotate_board
 
-    mov ax, word [board + r9 + 2*rdi]
+    call left
 
-    cmp ax, 0
-    jz .reloop
-
-    cmp ax, cx
-    je .combine_tile
-
-    mov word [board + r8 + 2*rdi], 0
-    mov word [board + r9 + 2*rdi + 8], cx
-    jmp .finish_tile
-
-.reloop:
-    dec rdx
-    cmp rdx, 4        ; compare to 4, since if rdx is 4 or greater we know the counter has underflowed
-    jb .tile_tile_loop
-    mov word [board + r8 + 2*rdi], 0
-    mov word [board + 2*rdi], cx
-
-    jmp .finish_tile
-
-.combine_tile:
-    shl cx, 1
-    mov word [board + r8 + 2*rdi], 0
-    mov word [board + r9 + 2*rdi], cx
-
-.finish_tile:
-
-    inc rsi
-    cmp rsi, 4
-    jl .tile_loop
-
-    inc rdi
-    cmp rdi, 4
-    jl .column_loop
-
-    jmp poll_loop
+    call rotate_board
+    ret
 
 down:
-    jmp poll_loop
+    call rotate_board
+
+    call left
+
+    call rotate_board
+    call rotate_board
+    call rotate_board
+    ret
 
 right:
-    xor rdi, rdi
-.row_loop:
-    mov rsi, 2
-    mov r8, rdi
-    shl r8, 3
-.tile_loop:
-    mov cx, word [board + r8 + 2*rsi]
-    mov rdx, rsi
-    inc rdx
-.tile_tile_loop: 
-    mov ax, word [board + r8 + 2*rdx]
+    call rotate_board
+    call rotate_board
 
-    cmp ax, 0
-    jz .reloop
+    call left
 
-    cmp ax, cx
-    je .combine_tile
-
-    mov word [board + r8 + 2*rsi], 0
-    mov word [board + r8 + 2*rdx - 2], cx
-    jmp .finish_tile
-
-.reloop:
-    inc rdx
-    cmp rdx, 4        
-    jl .tile_tile_loop
-    mov word [board + r8 + 2*rsi], 0
-    mov word [board + r8 + 6], cx
-
-    jmp .finish_tile
-
-.combine_tile:
-    shl cx, 1
-    mov word [board + r8 + 2*rsi], 0
-    mov word [board + r8 + 2*rdx], cx
-
-.finish_tile:
-
-    dec rsi
-    cmp rsi, 4      ; compare to 4, since if rsi is 4 or greater we know the counter has underflowed
-    jb .tile_loop
-
-    inc rdi
-    cmp rdi, 4
-    jl .row_loop
-    jmp poll_loop
+    call rotate_board
+    call rotate_board
+    ret
 
 left:
     xor rdi, rdi
@@ -189,6 +123,35 @@ left:
     jl .row_loop
 
     jmp poll_loop
+
+rotate_board:
+    mov rdi, scratch_board
+    mov rsi, board
+    mov rdx, 2*16           ; 16 tiles, 2 bytes per tile
+    call memcpy
+
+    xor rdi, rdi
+.row_loop:
+    xor rsi, rsi
+.column_loop:
+    shl rsi, 1
+    mov dx, word [scratch_board + 8*rdi + rsi]
+
+    shl sil, 1
+    sub rsi, rdi
+    mov word [board + 6 + 2*rsi], dx
+    add rsi, rdi
+    shr sil, 3
+
+    inc rsi
+    cmp sil, 4
+    jl .column_loop
+
+    inc rdi
+    cmp dil, 4
+    jl .row_loop
+
+    ret
 
 end_loss:
     push r12
@@ -388,4 +351,7 @@ section .data
 
     DEF_STR fg_color_dark, "0"
     DEF_STR fg_color_light, "15"
+
+section .bss
+    scratch_board: resw 16
     
