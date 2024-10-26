@@ -1,2 +1,0 @@
-# Say Cheese Assembly Example
-

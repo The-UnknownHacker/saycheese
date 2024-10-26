@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            --scroll: 0;
+            background-color: #FFF;
+            color: #000;
+            display: flex;
+            justify-content: center;
+        }
+
+        .opener {
+            max-width: 80vw;
+            max-height: 60vh;
+            width: 100%;
+            height: 100%;   
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .opener > img {
+            height: 100%;
+            width: 100%;
+            
+        }
+
+        .header {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .header > img {
+            width: 30%;
+            height: auto;
+        }
+
+        .header > h1 {
+            font-size: 5rem;
+            padding: 0;
+            margin: 0;
+        }
+
+        .content {
+            position: relative;
+            top: calc(min(--scroll*1vh, 100vh));
+            opacity: 1;
+            transition: opacity 500ms ease-in-out;
+        }
+
+        .hidden {
+            opacity: 0;
+        }
+
+        @media (orientation:landscape) {
+            .header {
+                max-width: 70vw
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="opener">
+        <img src="./static/saycheese_qr.svg" />
+    </div>
+    <div class="content hidden">
+        <div class="header">
+            <img src="./static/saycheese.png" />
+            <h1>Say Cheese!</h1>
+        </div>
+        <main>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.addEventListener('scroll', () => {
+                const scroll = window.scrollY / window.innerHeight;
+                document.body.style.setProperty('--scroll', scroll);
+            })
+        });
+    </script>
+</body>
+</html>
