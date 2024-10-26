@@ -32,4 +32,12 @@ There are two main methods to creating programs this small: HMTL+JS or an assemb
 Creating a program with HTML and JavaScript is a wonderful way to fit a program into a small size!
 This is because much of the work is already being handled by your browser.
 
+Check out the HTML+JS [example](./examples/web/) for a starting place!
+
 ## Assembly
+
+Creating your program in Assembly is just about the only way to create an executable small enough to fit inside a QR code. 
+While it is possible with a language such as C or C++,
+it requires lots of complicated compiler settings and optimizations.
+
+Check out the assembly [example](./examples/asm/) for a starting place!
