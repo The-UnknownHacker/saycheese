@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/commonkestrel/saycheese/main/static/saycheese.png" alt="Say Cheese logo" width="100" align="left" />
+<img src="https://github.com/commonkestrel/saycheese/raw/main/static/saycheese.png" alt="Say Cheese logo" width="100" align="left" />
 
 # Say Cheese
 
