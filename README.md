@@ -1,4 +1,4 @@
-<img src="https://github.com/commonkestrel/saycheese/raw/main/static/saycheese.png" alt="Say Cheese logo" width="100" align="left" />
+<img src="https://github.com/commonkestrel/saycheese/raw/main/static/say-cheese.png" alt="Say Cheese logo" width="100" align="left" />
 
 # Say Cheese
 
@@ -12,7 +12,7 @@ with the largest being version 40, encoding a measly 3 kilobytes of data.
 For reference, the cute little icon at the top of this README is a whopping 74 kilobytes.
 This means you have to fit a fully functioning program into a package over 20x smaller than a logo.
 
-The amazing thing about this ysws is it is completely platform agnostic!
+The amazing thing about this YSWS is it is completely platform agnostic!
 That means you can creat a program for x64 Linux,
 an ARM Mac, or even a TI calculator!
 If it fits inside a QR code, we want to see it!
