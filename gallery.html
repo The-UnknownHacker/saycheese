@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .submission {
+            border: 2px solid black;
+            border-radius: 2px;
+            display: flex;
+            flex-direction: column;
+            width: 25rem;
+            height: 30rem;
+            margin: 2rem;
+            text-decoration: none   ;
+        }
+
+        .submission > .header {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .submission > a {
+            margin: 0.25rem 0.25rem 0 0.25rem;
+        }
+
+        .submission > a > img {
+            max-width: 100%;
+        }
+
+        .submission h2 {
+            color: black;
+            font-size: 2rem;
+            margin: 0;
+            margin-left: 0.5rem;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .submission h4 {
+            color: #666;
+            margin: 0.25rem;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .gallery {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+        }
+    </style>
+</head>
+<body>
+    <div id="gallery" class="gallery"></div>
+    
+    <script>
+        const getJSON = async (url) => {
+            const response = await fetch(url, {cache: "no-cache"});
+            let json;
+
+            if (response.ok) {
+                json = await response.json();
+                console.warn("fetch success");
+                console.log(json);
+            } else {
+                console.error("fetch failed");
+            }
+
+            return json;
+        }
+
+        const appendSubmission = (base, name, author, qr) => {
+            console.warn(qr);
+
+            let submission = document.createElement("a");
+            submission.href = base + "index.html";
+            submission.classList.add("submission");
+
+            let img = document.createElement("img");
+            img.src = base + qr.image;
+            submission.appendChild(img);
+
+            let title_elem = document.createElement("h2");
+            title_elem.classList.add("title");
+            title_elem.innerText = name;
+            submission.appendChild(title_elem);
+
+            let author_elem = document.createElement("h4");
+            author_elem.classList.add("author");
+            author_elem.innerText = "By " + author;
+            submission.appendChild(author_elem);
+
+            document.getElementById("gallery").appendChild(submission);
+        }
+
+        getJSON("./submissions/submissions.json").then((json) => {
+            const submissions = json.submissions;
+            for (let i = 0; i < submissions.length; i++) {
+                const base = "/submissions/" + submissions[i] + "/";
+
+                getJSON(base + "proj.json").then((submission) => {
+                    appendSubmission(base, submission.name, submission.author, submission.qr);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -135,18 +135,18 @@
         }
 
         .hidden {
-            opacity: 0;
+            display: none;
         }
 
         .links {
-            position: fixed;
             top: 0;
             right: 0;
             height: 2.5rem;
             padding: 0.25rem;
             border-left: 2px solid black;
             border-bottom: 2px solid black;
-            border-radius: 0 0.5rem;
+            background-color: white;
+            border-radius: 0 0 0 0.5rem;
         }
 
         .links img {
@@ -158,10 +158,12 @@
         }
 
         .steps {
-            width: 100%;
+            width: 35rem;
+            max-width: 100%;
             display: flex;
             flex-direction: column;
             margin-top: 1rem;
+            margin-bottom: 3rem;
         }
 
         .steps > div {
@@ -172,7 +174,7 @@
         }
 
         .arrow {
-            height: 2rem;
+            height: 2.25rem;
             width: auto;
             image-rendering: crisp-edges;
         }
@@ -182,6 +184,9 @@
         }
 
         .step {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
             width: 10rem;
         }
@@ -219,6 +224,8 @@
         }
 
         h4 {
+            width: 100%;
+            text-align: center;
             margin: 0;
             padding: 0;
             line-height: 1;
@@ -229,12 +236,64 @@
             padding: 0;
         }
 
+        h4 {
+            font-size: 20px;
+        }
+
         p {
-            font-size: 18rpx;
+            font-size: 18px;
+        }
+
+        ul {
+            list-style: circle;
+            padding-left: 1rem;
+        }
+
+        li {
+            font-size: 18px;
         }
 
         .max-100 {
             max-width: 100%;
+        }   
+
+        .inverse {
+            color: white;
+            background-color: #000;
+            padding: 1.25rem;
+        }
+
+        header {
+            z-index: 999;
+            position: fixed;
+            width: 100%;
+            height: 2rem;
+            background-color: black;
+
+            display: flex;
+            flex-direction: row;
+            align-items: top;
+            justify-content: space-between;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            column-gap: 3rem;
+            margin-left: 1rem;
+            height: 1.75rem;
+            color: white;
+        }
+
+        .navbar-link {
+            font-size: 1.25rem;
+            color: white;
+            text-decoration: none;
+        }
+
+        .navbar-link:link {
+            color: white;
         }
 
         @media (orientation:landscape) {
@@ -271,6 +330,10 @@
             .max-45-90 {
                 max-width: 90%;
             }
+
+            .navbar-link {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
@@ -280,63 +343,71 @@
             <img src="./static/say-cheese-qr.png" />
         </div>  
     </div>
-    <div class="links">
-        <a href="https://github.com/commonkestrel/saycheese" target="_blank">
-            <img src="./static/github-mark.svg">
-        </a>
-    </div>
+    <header>
+        <div class="navbar">
+            <a class="navbar-link" href="/gallery.html">gallery</a>
+            <a class="navbar-link" href="/submit.html">submit</a>
+            <a class="navbar-link" href="/tutorial.html">tutorial-ish</a>
+
+        </div>
+        <div class="links">
+            <a href="https://github.com/commonkestrel/saycheese" target="_blank">
+                <img src="./static/github-mark.svg">
+            </a>
+        </div>
+    </header>
     <div class="content">
         <div class="header">
             <img src="./static/say-cheese.png" />
             <h1>say cheese!</h1>
         </div> 
         <main>
-            <p>
-                storage is too cheap nowadays. why not make it convenient instead?
-            </p>
+            <p class="inverse"> storage is too cheap nowadays. why not make it convenient instead?</p>
+
+            <div class="steps">
+                <div>
+                    <img src="./static/arrow.png" class="arrow">
+                    <div></div>
+                    
+                </div>
+                <div class="flex-between"> 
+                    <div class="step">
+                        <p>build a program</p>
+                    </div>
+                    <div class="step">
+                        <p>fit it in a QR code</p>
+                    </div>
+                    <div class="step">
+                        <p>profit???</p>
+                    </div> 
+                </div>
+                <div>
+                    <div></div>
+                    <img src="./static/arrow.png" class="arrow rot-x-180">
+                </div>
+            </div>
             
-            <h4>what counts?</h4>
-            <p>
-                any program inside a qr code!
-                this is platform agnostic,
-                which means your program can run on x64 Linux, ARM Windows, or a Nintendo DS.
-                as long as it's small enough to fit in a qr code, it counts!    
-            </p>
             <div class="max-100 flex flex-row-column flex-between">
                 <div class="max-45-90">
-                    <h4>what do?</h4>
-                    <ul class="nopad">
-                        <li>join the <a href="https://hackclub.slack.com/archives/C07QKKZPVD0">#saycheese</a> channel in the Hack Club Slack</li>
-                        <li>build a game</li>
-                        <li>fit it in a QR code</li>
-                        <li><a href="./submit.html">submit</a> it by ???</li>
+                    
+                    <h4>what counts?</h4>
+                    <p>
+                        any program inside a qr code!
+                        this is platform agnostic,
+                        which means your program can run on x64 Linux, ARM Windows, or a Nintendo DS.
+                        as long as it's small enough to fit in a qr code, it counts!    
+                    </p>
+
+                    <h4>what do i get?</h4>
+                    <ul>
+                        <li>my undying love and affection</li>
+                        <li>a portable printer to print qr codes to your heart's content! <s>it may or may not be cat themed</s></li>
+                        <li>the best project gets a blåhaj!</li>
                     </ul>
-                    <div class="steps">
-                        <div>
-                            <img src="./static/arrow.png" class="arrow">
-                            <div></div>
-                            
-                        </div>
-                        <div class="flex-between"> 
-                            <div class="step">
-                                <p>Build a program</p>
-                            </div>
-                            <div class="step">
-                                <p>Fit it in a QR code</p>
-                            </div>
-                            <div class="step">
-                                <p>Profit???</p>
-                            </div> 
-                        </div>
-                        <div>
-                            <div></div>
-                            <img src="./static/arrow.png" class="arrow rot-x-180">
-                        </div>
-                    </div>  
                 </div>
                 <div class="max-45-90">
                     <h4>how do?</h4>
-                    <p class="nopad">
+                    <p class="">
                        size optimization is the real challenge here!
                        there are a few ways you can fit a program this small into a qr code,
                        but the best ways are programming in an assembly language
@@ -352,6 +423,9 @@
             </div>
         </main>
     </div>
+
+    <!-- :3 -->
+    <img src="./static/blahaj.png" class="hidden blahaj" />
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
