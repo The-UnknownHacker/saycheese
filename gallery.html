@@ -3,16 +3,48 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="nav.css">
+    <link rel="stylesheet" href="global.css">
     <style>
+        body {
+            margin: 0;
+        }
+
+        main {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
         .submission {
             border: 2px solid black;
             border-radius: 2px;
             display: flex;
             flex-direction: column;
-            width: 25rem;
-            height: 30rem;
+            width: 22rem;
+            height: 27rem;
             margin: 2rem;
-            text-decoration: none   ;
+            padding: 0.25rem;
+            text-decoration: none;
+        }
+
+        .right-tilt {
+            transform: rotate(2.5deg) scale(100%);
+            transition: 250ms transform ease-out;
+        }
+
+        .right-tilt:hover {
+            transform: rotate(-1deg) scale(101%);
+        }
+
+        .left-tilt {
+            transform: rotate(-2.5deg)
         }
 
         .submission > .header {
@@ -26,8 +58,9 @@
             margin: 0.25rem 0.25rem 0 0.25rem;
         }
 
-        .submission > a > img {
+        .submission > img {
             max-width: 100%;
+            max-height: calc(100% - 5rem);
         }
 
         .submission h2 {
@@ -51,10 +84,36 @@
             flex-direction: row;
             justify-content: space-around;
         }
+
+        #testblock {
+            width: 2rem;
+            height: 2rem;
+            background-color: black;
+            transition: 100ms top ease-in, 100ms left ease-in;
+        }
     </style>
 </head>
 <body>
-    <div id="gallery" class="gallery"></div>
+    <header>
+        <div class="navbar">
+            <a class="navbar-link" href="/gallery.html">gallery</a>
+            <a class="navbar-link" href="/submit.html">submit</a>
+            <a class="navbar-link" href="/tutorial.html">tutorial-ish</a>
+
+        </div>
+        <div class="links">
+            <a href="https://github.com/commonkestrel/saycheese" target="_blank">
+                <img src="./static/github-mark.svg">
+            </a>
+        </div>
+    </header>
+    
+    <main>
+        <h1>gallery</h1>
+        <small>as you submit projects they will appear here for the world to see!</small>
+        <div id="gallery" class="gallery"></div>
+        <div id="testblock"></div>
+    </main>
     
     <script>
         const getJSON = async (url) => {
@@ -72,12 +131,33 @@
             return json;
         }
 
-        const appendSubmission = (base, name, author, qr) => {
-            console.warn(qr);
+        const block = document.getElementById("testblock");
+        block.addEventListener("click", (ev) => {
+            const bounds = block.getBoundingClientRect();
+            const scroll = document.body.scrollTop;
+            block.style.position = "fixed";
 
+            block.style.top = ((bounds.top - scroll)/window.innerHeight * 100).toString() + "vh";
+            block.style.left = (bounds.left/innerWidth * 100).toString() + "vw";
+
+            setTimeout(() => {
+                block.style.top = "50vh";
+                block.style.left = "50vw";
+            }, 0);
+
+            console.warn("clicked!");
+        });
+
+        const appendSubmission = (base, name, author, qr, i) => {
             let submission = document.createElement("a");
             submission.href = base + "index.html";
             submission.classList.add("submission");
+            // submission.classList.add("pixel-corners");
+            if (i % 2 == 0) {
+                submission.classList.add("right-tilt");
+            } else {
+                submission.classList.add("left-tilt");
+            }
 
             let img = document.createElement("img");
             img.src = base + qr.image;
@@ -102,7 +182,7 @@
                 const base = "/submissions/" + submissions[i] + "/";
 
                 getJSON(base + "proj.json").then((submission) => {
-                    appendSubmission(base, submission.name, submission.author, submission.qr);
+                    appendSubmission(base, submission.name, submission.author, submission.qr, i);
                 });
             }
         });
