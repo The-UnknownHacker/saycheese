@@ -8,7 +8,7 @@
     },
     "demo": "proj.gif",
     "os": "Linux",
-    "architecture": "x64",
-    "description": "A game of 2048 in the command line! Use WASD to move and Enter/Return to exit.",
+    "arch": "x64",
+    "description": "A game of 2048 in the command line! It is programmed in NASM assembly for the x64 architecture, using Linux syscalls to print to the terminal. Use WASD to shift the board and use Enter/Return to exit.",
     "repo": "https://github.com/commonkestrel/saycheese/tree/main/examples/asm/"
 }

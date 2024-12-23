@@ -30,7 +30,7 @@
             width: 22rem;
             height: 27rem;
             margin: 2rem;
-            padding: 0.25rem;
+            padding: 1rem;
             text-decoration: none;
         }
 
@@ -61,6 +61,7 @@
         .submission > img {
             max-width: 100%;
             max-height: calc(100% - 5rem);
+            object-fit: contain;
         }
 
         .submission h2 {
@@ -75,6 +76,7 @@
         .submission h4 {
             color: #666;
             margin: 0.25rem;
+            margin-left: 0.5rem;
             padding: 0;
             line-height: 1;
         }
@@ -85,11 +87,139 @@
             justify-content: space-around;
         }
 
-        #testblock {
-            width: 2rem;
-            height: 2rem;
+        .inverse {
             background-color: black;
-            transition: 100ms top ease-in, 100ms left ease-in;
+            color: white;
+            padding: 0.5rem;
+            margin-right: 0.5rem;
+        }
+
+        #modal-title {
+            margin: 0;
+            padding: 0;
+            line-height: 1;
+        }
+
+        #modal-author {
+            padding: 0;
+            margin-top: 0.1rem;
+            margin-bottom: 0.5rem;
+            color: #444;
+        }
+
+        #modal-os {
+            padding-top: 0.5rem;
+            margin-right: 1rem;
+        }
+
+        #modal-arch {
+            padding-top: 0.5rem;
+        }
+
+        #modal-close {
+            position: fixed;
+            top: 2rem;
+            left: 0rem;
+            height: 3rem;
+            width: 3rem;
+            opacity: 0;
+            transition: 250ms opacity ease-in;
+        }
+
+        .modal.open > #modal-close {
+            opacity: 1;
+            cursor: pointer;
+        }
+
+        #modal-close > :nth-child(1) {
+            width: 3rem;
+            height: 0.25rem;
+            background-color: black;
+            position: fixed;
+            top: 3.5rem;
+            left: 0rem;
+            transform: rotate(45deg);
+        }
+
+        #modal-close > :nth-child(2) {
+            width: 3rem;
+            height: 0.25rem;
+            background-color: black;
+            position: fixed;
+            top: 3.5rem;
+            left: 0rem;
+            transform: rotate(-45deg);
+        }
+
+        @media (orientation:landscape) {
+            .modal-back {
+                height: 100vh;
+                width: 0;
+                z-index: 996;
+                background-color: white;
+                position: fixed;
+                top: 0;
+                left: 0;
+                transition: 500ms width ease-in;
+            }
+
+            .modal-back.open {
+                width: 100vw;
+            }
+
+            .modal {
+                position: fixed;
+                top: 2rem;
+                left: 0;
+                height: calc(100vh - 2rem);
+                overflow-x: hidden;
+                overflow-y: scroll;
+                width: 0;
+                transition: 500ms width ease-out;
+                display: flex;
+                align-items: left;
+                z-index: 997;
+            }
+
+            .modal.open {
+                width: 100vw;
+            }
+
+            .modal-inner {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                width: 100vw;
+                min-width: 100vw;
+                column-gap: 3rem;
+            }
+
+            #modal-qr {
+                height: 80vh;
+                width: 80vh;
+            }
+
+            #modal-demo {
+                height: 45vh;
+                object-fit: contain;
+                object-position: left;
+            }
+
+            .description {
+                max-width: 30rem;
+                line-height: 1.6;
+            }
+
+            .flex-row {
+                display: flex;
+                flex-direction: row;
+            }
+
+            .flex-column {
+                display: flex;
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -109,10 +239,34 @@
     </header>
     
     <main>
+        <div class="modal-back" id="modal-back"></div>
+        <div class="modal" id="modal">
+            <div id="modal-close">
+                <div></div>
+                <div></div>
+            </div>
+            <div class="modal-inner">
+                <img id="modal-qr" />
+                <div class="flex-column">
+                    <h1 id="modal-title"></h1>
+                    <h3 id="modal-author"></h3>
+                    <img id="modal-demo" />
+                    <div class="flex-row">
+                        <p class="inverse">operating system: </p>
+                        <p id="modal-os"></p>
+                        <p class="inverse">architecture: </p>
+                        <p id="modal-arch"></p>
+                    </div>
+                    <p class="description">
+                        <span class="inverse">description: </span>
+                        <span id="modal-desc"></span>
+                    </p>
+                </div>
+            </div>
+        </div>
         <h1>gallery</h1>
         <small>as you submit projects they will appear here for the world to see!</small>
         <div id="gallery" class="gallery"></div>
-        <div id="testblock"></div>
     </main>
     
     <script>
@@ -131,49 +285,53 @@
             return json;
         }
 
-        const block = document.getElementById("testblock");
-        block.addEventListener("click", (ev) => {
-            const bounds = block.getBoundingClientRect();
-            const scroll = document.body.scrollTop;
-            block.style.position = "fixed";
+        const openSubmission = (base, submission) => {
+            document.getElementById("modal-title").innerText = submission.name;
+            document.getElementById("modal-author").innerText = "By " + submission.author;
+            document.getElementById("modal-os").innerText = submission.os;
+            document.getElementById("modal-arch").innerText = submission.arch;
+            document.getElementById("modal-desc").innerText = submission.description;
+            document.getElementById("modal-demo").src = base + submission.demo;
+            document.getElementById("modal-qr").src = base + submission.qr.image;
 
-            block.style.top = ((bounds.top - scroll)/window.innerHeight * 100).toString() + "vh";
-            block.style.left = (bounds.left/innerWidth * 100).toString() + "vw";
-
-            setTimeout(() => {
-                block.style.top = "50vh";
-                block.style.left = "50vw";
-            }, 0);
-
-            console.warn("clicked!");
+            document.getElementById("modal-back").classList.add("open");
+            setTimeout(
+                () => document.getElementById("modal").classList.add("open"), 450
+            );
+        };
+        
+        document.getElementById("modal-close").addEventListener("click", () => {
+            console.log("closing")
+            document.getElementById("modal-back").classList.remove("open")
+            document.getElementById("modal").classList.remove("open");
         });
 
-        const appendSubmission = (base, name, author, qr, i) => {
-            let submission = document.createElement("a");
-            submission.href = base + "index.html";
-            submission.classList.add("submission");
-            // submission.classList.add("pixel-corners");
+        const appendSubmission = (base, submission, i) => {
+            let submission_el = document.createElement("a");
+            submission_el.classList.add("submission");
             if (i % 2 == 0) {
-                submission.classList.add("right-tilt");
+                submission_el.classList.add("right-tilt");
             } else {
-                submission.classList.add("left-tilt");
+                submission_el.classList.add("left-tilt");
             }
 
             let img = document.createElement("img");
-            img.src = base + qr.image;
-            submission.appendChild(img);
+            img.src = base + submission.qr.image;
+            submission_el.appendChild(img);
 
-            let title_elem = document.createElement("h2");
-            title_elem.classList.add("title");
-            title_elem.innerText = name;
-            submission.appendChild(title_elem);
+            let title = document.createElement("h2");
+            title.classList.add("title");
+            title.innerText = submission.name;
+            submission_el.appendChild(title);
 
-            let author_elem = document.createElement("h4");
-            author_elem.classList.add("author");
-            author_elem.innerText = "By " + author;
-            submission.appendChild(author_elem);
+            let author = document.createElement("h4");
+            author.classList.add("author");
+            author.innerText = "by " + submission.author;
+            submission_el.appendChild(author);
 
-            document.getElementById("gallery").appendChild(submission);
+            document.getElementById("gallery").appendChild(submission_el);
+
+            submission_el.addEventListener("click", () => openSubmission(base, submission))
         }
 
         getJSON("./submissions/submissions.json").then((json) => {
@@ -182,7 +340,7 @@
                 const base = "/submissions/" + submissions[i] + "/";
 
                 getJSON(base + "proj.json").then((submission) => {
-                    appendSubmission(base, submission.name, submission.author, submission.qr, i);
+                    appendSubmission(base, submission, i);
                 });
             }
         });
