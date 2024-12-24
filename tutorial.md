@@ -1,7 +1,7 @@
 # Tutorial-ish
 
 Starting a project like this can be daunting,
-which is why I've put together a semi-tutorial that details a how to get started and how to optimize for size!
+which is why I've put together a semi-tutorial that gives a quick introduction to optimizing for size!
 The limits of QR codes require our entire program to fit inside a binary that is less than 3 kilobytes large.
 Size optimization on this scale brings a whole slew of challenges,
 namely the fact that most high-level languages are unable to fit in such a small size.
@@ -11,7 +11,19 @@ There are a few different ways to get around this,
 namely using languages that allow you either fine-grain control of the binary size,
 or offload much of the processing to the host device.
 This makes either a form of assembly language ideal for binaries,
-or HTML+JavaScript for a web app! 
+or HTML+JavaScript for a web app
+
+For both of these methods,
+you'll need a way for your users to actually use your program ~~obviously~~.
+Although you could just use a binary QR-code,
+this adds lots of extra steps for your users.
+The method I recommend is to use the [Data URI Scheme](https://developer.mozilla.org/en-US/docs/Web/URI/Schemes/data).
+This scheme is able to accomodate both webpages and native binaries
+(with the "text/html" and "application/octet-stream" media types respectively).
+While this does reduce the total size of your program from 3kB to 2kB,
+a pretty substantial reduction,
+but it allows your users to simply scan your QR code and have you program 
+either automatically opened or downloaded without any additional steps!
 
 ## Assembly
 
@@ -31,6 +43,9 @@ A consequence of this, however,
 is that I can't possibly tell you how to optimize for every single platform.
 Although, if you're looking for a way to get into Assembly programming,
 make sure to check out Hack Club's own [Some Assembly Required](https://github.com/hackclub/some-assembly-required), an approchable introduction to assembly.
+
+If you're building for Linux and you're stuck on getting the ELF file smaller than 3kB,
+take a look at this [incredible guide](https://www.muppetlabs.com/~breadbox/software/tiny/teensy.html) to ELF size optimization!
 
 ## HTML+JavaScript
 

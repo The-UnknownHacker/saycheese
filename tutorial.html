@@ -190,19 +190,33 @@
     <main>
         <h1 id="tutorial-ish">Tutorial-ish</h1>
         <p>Starting a project like this can be daunting, which is why I've put
-        together a semi-tutorial that details a how to get started and how to
-        optimize for size! The limits of QR codes require our entire program to
+        together a semi-tutorial that gives a quick introduction to optimizing
+        for size! The limits of QR codes require our entire program to
         fit inside a binary that is less than 3 kilobytes large. Size
         optimization on this scale brings a whole slew of challenges, namely the
         fact that most high-level languages are unable to fit in such a small
-        size. Even a simple hello world program in C takes up a whopping 297
-        kilobytes!</p>
+        size. Even a simple hello world program in C takes up a whopping 297kB!</p>
+
         <p>There are a few different ways to get around this, namely using
         languages that allow you either fine-grain control of the binary size,
         or offload much of the processing to the host device. This makes either
         a form of assembly language ideal for binaries, or HTML+JavaScript for a
         web app!</p>
-        <h2 id="assembly">Assembly</h1>
+
+        <p>For both of these methods, you'll need a way for your users to actually
+        use your program <del>obviously</del>. Although you could just use a 
+        binary QR-code, this adds lots of extra steps for your users. The method
+        I recommend is to use the <a
+        href="https://developer.mozilla.org/en-US/docs/Web/URI/Schemes/data">
+        Data URI Scheme</a>. This scheme is able to accomodate both webpages and
+        native binaries (with the "text/html" and "application/octet-stream"
+        media types respectively). This does reduce the total size of your program
+        from 3kB to 2kB, a pretty substantial reduction, but it allows your users
+        to simply scan your QR code and have you program either automatically
+        opened or downloaded without any additional steps!</p>
+
+        <h2 id="assembly">Assembly</h2>
+
         <p>Assembly is just about the only way to build native binaries small
         enough to fit inside a QR code, unless you're prepared to do some major
         fiddling with your preferred compiler while avoiding breaking your
@@ -211,16 +225,24 @@
         and a curse, since you will only be able to create a program for a
         single system, but you are also able to create a program for any system
         you can dream of.</p>
+
         <p>Say Cheese is platform agnostic, meaning you're allowed to build a
         program for anything, be it a common platform like x64 Windows, or
         something outlandish like the TI-84 Graphing Calculator or the Nintendo
         GameBoy. Whatever you desire, you can build for!</p>
+
         <p>A consequence of this, however, is that I can't possibly tell you how
         to optimize for every single platform. Although, if you're looking for a
         way to get into Assembly programming, make sure to check out Hack Club's
         own <a href="https://github.com/hackclub/some-assembly-required">Some
         Assembly Required</a>, an approchable introduction to assembly.</p>
-        <h2 id="htmljavascript">HTML+JavaScript</h1>
+
+        <p>If you're building for Linux and you're stuck on getting the ELF file 
+        smaller than 3kB, take a look at this <a 
+        href="https://www.muppetlabs.com/~breadbox/software/tiny/teensy.html">
+        incredible guide</a> to ELF size optimization!</p>
+        <h2 id="htmljavascript">HTML+JavaScript</h2>
+
         <p>JavaScript is what's called an interpretted language, which means
         that much of the actual work is done by another program. For JS, this is
         typically a browser <del>or Node/Bun/Deno if you're feeling silly</del>.
@@ -231,6 +253,7 @@
         href="https://waka.hackclub.com">Hackatime dashboard</a>, used for <a
         href="httpps://highseas.hackclub.com">High Seas</a>, has a single base
         (<code>base.js</code>) that is 33kB, 10x bigger than we can fit!</p>
+
         <p>The main way to combat size in JavaScript and HTML is something
         called "minifying". Essentially, getting rid of all unnecesarry blank
         space and long variable names. This makes the code much less readable,
