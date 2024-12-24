@@ -1,8 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="The gallery of submitted projects for Hack Club's Say Cheese YSWS." />
+
+    <title>Say Cheese: Gallery</title>
+    
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="stylesheet" href="nav.css">
     <link rel="stylesheet" href="global.css">
     <style>
@@ -28,10 +33,13 @@
             display: flex;
             flex-direction: column;
             width: 22rem;
+            max-width: 70vw;
             height: 27rem;
+            max-height: 85.909vw;
             margin: 2rem;
             padding: 1rem;
             text-decoration: none;
+            cursor: pointer;
         }
 
         .right-tilt {
@@ -73,8 +81,9 @@
             line-height: 1;
         }
 
-        .submission h4 {
+        .submission h3 {
             color: #666;
+            font-size: 20px;
             margin: 0.25rem;
             margin-left: 0.5rem;
             padding: 0;
@@ -233,24 +242,24 @@
         </div>
         <div class="links">
             <a href="https://github.com/commonkestrel/saycheese" target="_blank">
-                <img src="./static/github-mark.svg">
+                <img src="./static/github-mark.svg" alt="github logo">
             </a>
         </div>
     </header>
     
     <main>
         <div class="modal-back" id="modal-back"></div>
-        <div class="modal" id="modal">
+        <div class="modal" id="modal" style="display: none;">
             <div id="modal-close">
                 <div></div>
                 <div></div>
             </div>
             <div class="modal-inner">
-                <img id="modal-qr" />
+                <img id="modal-qr" alt="selected project qr-code" />
                 <div class="flex-column">
                     <h1 id="modal-title"></h1>
                     <h3 id="modal-author"></h3>
-                    <img id="modal-demo" />
+                    <img id="modal-demo" alt="selected project demo" />
                     <div class="flex-row">
                         <p class="inverse">operating system: </p>
                         <p id="modal-os"></p>
@@ -295,6 +304,7 @@
             document.getElementById("modal-qr").src = base + submission.qr.image;
 
             document.getElementById("modal-back").classList.add("open");
+            document.getElementById("modal").style.display = "";
             setTimeout(
                 () => document.getElementById("modal").classList.add("open"), 450
             );
@@ -307,7 +317,7 @@
         });
 
         const appendSubmission = (base, submission, i) => {
-            let submission_el = document.createElement("a");
+            let submission_el = document.createElement("div");
             submission_el.classList.add("submission");
             if (i % 2 == 0) {
                 submission_el.classList.add("right-tilt");
@@ -317,6 +327,7 @@
 
             let img = document.createElement("img");
             img.src = base + submission.qr.image;
+            img.alt = submission.name + " qr-code";
             submission_el.appendChild(img);
 
             let title = document.createElement("h2");
@@ -324,7 +335,7 @@
             title.innerText = submission.name;
             submission_el.appendChild(title);
 
-            let author = document.createElement("h4");
+            let author = document.createElement("h3");
             author.classList.add("author");
             author.innerText = "by " + submission.author;
             submission_el.appendChild(author);
