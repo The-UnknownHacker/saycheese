@@ -160,15 +160,39 @@
             transform: rotate(-45deg);
         }
 
+        .modal {
+            position: fixed;
+            top: 2rem;
+            left: 0;
+            overflow-x: hidden;
+            overflow-y: scroll;
+            display: flex;
+            align-items: left;
+            z-index: 997;
+        }
+
+        .modal-back {
+            z-index: 996;
+            background-color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        .flex-row {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .flex-column {
+            display: flex;
+            flex-direction: column;
+        }
+
         @media (orientation:landscape) {
             .modal-back {
                 height: 100vh;
                 width: 0;
-                z-index: 996;
-                background-color: white;
-                position: fixed;
-                top: 0;
-                left: 0;
                 transition: 500ms width ease-in;
             }
 
@@ -177,17 +201,9 @@
             }
 
             .modal {
-                position: fixed;
-                top: 2rem;
-                left: 0;
                 height: calc(100vh - 2rem);
-                overflow-x: hidden;
-                overflow-y: scroll;
                 width: 0;
                 transition: 500ms width ease-out;
-                display: flex;
-                align-items: left;
-                z-index: 997;
             }
 
             .modal.open {
@@ -219,15 +235,55 @@
                 max-width: 30rem;
                 line-height: 1.6;
             }
+        }
 
-            .flex-row {
-                display: flex;
-                flex-direction: row;
+        @media (orientation:portrait) {
+            .modal {
+                height: 0;
+                width: 100vw;
+                transition: 500ms height ease-out;
             }
 
-            .flex-column {
+            .modal.open {
+                height: calc(100vh - 2rem);
+            }
+
+            .modal-back {
+                height: 0;
+                width: 100vw;
+                transition: 500ms height ease-in;
+            }
+
+            .modal-back.open {
+                height: 100vh;
+            }
+
+            .modal-inner {
+                width: 100vw;
                 display: flex;
                 flex-direction: column;
+                align-items: center;
+                justify-content: top;
+            }
+
+            #modal-demo {
+                width: 60vw;
+                object-fit: contain;
+                object-position: center;
+            }
+
+            #modal-qr {
+                padding-top: 3rem;
+                width: calc(100vw - 5rem);
+            }
+
+            .description {
+                max-width: 80vw;
+                line-height: 1.6;
+            }
+
+            .mobile-center {
+                align-items: center;
             }
         }
     </style>
@@ -235,7 +291,7 @@
 <body>
     <header>
         <div class="navbar">
-            <a class="navbar-link" href="/gallery.html">gallery</a>
+            <a class="navbar-link" href="/">home</a>
             <a class="navbar-link" href="https://forms.hackclub.com/say-cheese-submission">submit</a>
             <a class="navbar-link" href="/tutorial.html">tutorial-ish</a>
 
@@ -255,8 +311,10 @@
                 <div></div>
             </div>
             <div class="modal-inner">
-                <img id="modal-qr" alt="selected project qr-code" />
-                <div class="flex-column">
+                <a id="modal-qr-anchor">
+                    <img id="modal-qr" alt="selected project qr-code" />
+                </a>
+                <div class="flex-column mobile-center">
                     <h1 id="modal-title"></h1>
                     <h3 id="modal-author"></h3>
                     <img id="modal-demo" alt="selected project demo" />
@@ -302,7 +360,10 @@
             document.getElementById("modal-desc").innerText = submission.description;
             document.getElementById("modal-demo").src = base + submission.demo;
             document.getElementById("modal-qr").src = base + submission.qr.image;
-
+            if (submission.qr.type == "Url") {
+                document.getElementById("modal-qr-anchor").href = submission.qr.url;
+            }
+            
             document.getElementById("modal-back").classList.add("open");
             document.getElementById("modal").style.display = "";
             setTimeout(
