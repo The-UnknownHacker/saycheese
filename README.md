@@ -23,7 +23,7 @@ Unfortunately, the default QR reader on some devices (looking at you Apple) inco
 so you may have to download an external app to scan it.
 In addition, encoding a binary into a data uri does limit the size to an even smaller size, just a bit over 2Kb.
 
-There are two main methods to creating programs this small: HMTL+JS or an assembly language:
+There are two main methods to creating programs this small: HTML+JS or an assembly language:
 
 ## HTML+JS
 
